@@ -1,0 +1,83 @@
+/* SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+Temporaly solution of "this is incompatible with sql_mode=only_full_group_by" */
+
+USE sakila;
+
+/*ejercicio 3.1*/
+
+SELECT  title from film LIMIT 20;
+
+/*ejercicio 3.2*/
+
+SELECT DISTINCT release_year FROM film GROUP BY release_year;
+
+/*ejercicio 3.3*/
+
+SELECT title from film where rental_duration>4;
+
+/*ejercicio 3.4*/
+
+SELECT customer_id, rental_id,amount,payment_date from payment where payment_date BETWEEN cast('2005-07-01' AS DATE) AND CAST('2005-08-01'AS DATE);
+
+/*ejercicio 4.1*/
+
+SELECT COUNT(*) AS total FROM customer;
+
+/*ejercicio 4.2*/
+
+SELECT COUNT(*) from rental GROUP BY customer_id;
+
+/*ejercicio 4.3*/
+
+SELECT MAX(total) FROM (SELECT customer_id,count(*) as total FROM rental GROUP BY customer_id) as t1;
+
+/*ejercicio 4.5*/
+
+SELECT staff_id,count(*) AS total FROM payment GROUP BY staff_id;*/
+
+/*ejercicio 4.6*/
+
+SELECT MAX(total),staff_id FROM
+(SELECT staff_id,SUM(amount) as total from payment where
+payment_date between cast('2005-08-23 00:00:00' AS DATE) AND CAST('2005-08-23 23:59:59' AS DATE) GROUP BY staff_id) as t1;
+
+/*ejercicio 5.1*/
+
+SELECT title,name from film as t1 inner join language as t2;
+
+/*ejercicio 5.2*/
+
+SELECT first_name , last_name , rental_id, title FROM customer AS t1
+INNER JOIN film AS t2 ON t2.title = "CHICAGO NORTH"
+INNER JOIN inventory AS t4 ON t4.film_id = t2.film_id
+INNER JOIN .rental AS t3 ON t3.inventory_id = t4.inventory_id
+AND t1.customer_id = t3.customer_id;
+
+/*ejercicio 5.3*/
+
+SELECT first_name, last_name, city from customer as t1
+inner join address as t2 on t2.address_id=t1.address_id
+INNER join city as t3 on t2.city_id=t3.city_id;
+
+/*ejercicio 5.4*/
+
+SELECT title,COUNT(*) from film as t1
+inner join inventory as t2 on t2.film_id=t1.film_id inner join rental as t3 on
+t3.inventory_id=t2.inventory_id  GROUP by title;
+
+/*ejercicio 5.5*/
+
+SELECT filmtitle, MAX(tot) FROM(
+SELECT title AS filmtitle, sum(amount) AS tot
+FROM payment AS t1 INNER JOIN rental AS t2 ON t1.rental_id = t2.rental_id
+INNER JOIN inventory AS t3 ON t3.inventory_id = t2.inventory_id INNER JOIN .film AS t4 ON t4.film_id = t3.film_id
+GROUP BY title
+ORDER BY tot DESC)
+AS t55;
+
+/*ejercicio 5.6*/
+
+SELECT first_name, last_name, amount
+FROM customer INNER JOIN payment USING(customer_id)
+WHERE amount > 10
+GROUP BY customer_id;
